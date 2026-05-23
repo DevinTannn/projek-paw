@@ -1,0 +1,110 @@
+<!-- ========================= -->
+<!-- FILE : index.html -->
+<!-- ========================= -->
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumah Makan Padma Mulia</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <h2>Padma Mulia</h2>
+
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#pesan">Pemesanan</a></li>
+            <li><a href="#kontak">Kontak</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Rumah Makan Padma Mulia</h1>
+
+        <p>
+            Menyediakan makanan khas Indonesia dengan rasa terbaik
+            dan harga terjangkau.
+        </p>
+
+        <button onclick="scrollMenu()">
+            Lihat Menu
+        </button>
+    </section>
+
+    <!-- Menu -->
+    <section class="menu" id="menu">
+        <h2>Daftar Menu</h2>
+
+        <div class="menu-container">
+
+            <div class="card">
+                <h3>Nasi Goreng</h3>
+                <p>Rp 20.000</p>
+            </div>
+
+            <div class="card">
+                <h3>Mie Goreng</h3>
+                <p>Rp 18.000</p>
+            </div>
+
+            <div class="card">
+                <h3>Ayam Bakar</h3>
+                <p>Rp 25.000</p>
+            </div>
+
+            <div class="card">
+                <h3>Es Teh</h3>
+                <p>Rp 5.000</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Form Pemesanan -->
+    <section class="pesan" id="pesan">
+
+        <h2>Form Pemesanan</h2>
+
+        <form id="formPesan">
+
+            <input type="text" id="nama" placeholder="Masukkan Nama" required>
+
+            <select id="menuMakanan" required>
+                <option value="">-- Pilih Menu --</option>
+                <option value="Nasi Goreng">Nasi Goreng</option>
+                <option value="Mie Goreng">Mie Goreng</option>
+                <option value="Ayam Bakar">Ayam Bakar</option>
+                <option value="Es Teh">Es Teh</option>
+            </select>
+
+            <input type="number" id="jumlah" placeholder="Jumlah Pesanan" required>
+
+            <button type="submit">
+                Pesan Sekarang
+            </button>
+
+        </form>
+
+        <div id="hasil"></div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer id="kontak">
+        <p>© 2026 Rumah Makan Padma Mulia</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
