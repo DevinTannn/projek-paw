@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Manchester United FC</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #c70101;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #111;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #c70101;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .players {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .player {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 8px;
+            width: 200px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #c70101;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #a00000;
+        }
+
+        footer {
+            background-color: #111;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Manchester United</h1>
+    <p>The Red Devils</p>
+</header>
+
+<nav>
+    <a href="#">Home</a>
+    <a href="#">Sejarah</a>
+    <a href="#">Pemain</a>
+    <a href="#">Kontak</a>
+</nav>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Profil Klub</h2>
+        <p>
+            Manchester United Football Club adalah klub sepak bola profesional asal Inggris
+            yang bermarkas di Old Trafford, Manchester.
+        </p>
+        <button onclick="showTrophy()">Lihat Prestasi</button>
+        <p id="trophy"></p>
+    </div>
+
+    <div class="card">
+        <h2>Legenda Pemain</h2>
+        <div class="players">
+            <div class="player">
+                <h3>Ryan Giggs</h3>
+                <p>Gelandang</p>
+            </div>
+            <div class="player">
+                <h3>Paul Scholes</h3>
+                <p>Gelandang</p>
+            </div>
+            <div class="player">
+                <h3>Wayne Rooney</h3>
+                <p>Striker</p>
+            </div>
+            <div class="player">
+                <h3>Cristiano Ronaldo</h3>
+                <p>Winger</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>&copy; 2026 Manchester United Fan Website</p>
+</footer>
+
+<script>
+    function showTrophy() {
+        document.getElementById("trophy").innerHTML =
+            "🏆 20x Liga Inggris<br>🏆 3x Liga Champions<br>🏆 12x FA Cup";
+    }
+</script>
+
+</body>
+</html>
