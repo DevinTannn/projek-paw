@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\CustomerController;
 use App\Http\Controllers\CustomerMenuController;
-
+use App\Http\Controllers\TransaksiController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,3 +23,33 @@ Route::get('/meja/{nomor_meja}', function ($nomor_meja) {
 Route::prefix('dashboard')->group(function () {
     Route::resource('customers', CustomerController::class);
 });
+
+Route::prefix('kasir')
+    ->middleware(['auth', 'verified'])
+    ->name('kasir.')
+    ->group(function () {
+
+        // Dashboard kasir
+        Route::get('/dashboard', [TransaksiController::class, 'index'])
+            ->name('dashboard');
+
+        // Buat transaksi baru
+        Route::get('/transaksi/buat', [TransaksiController::class, 'create'])
+            ->name('transaksi.buat');
+
+        // Simpan transaksi
+        Route::post('/transaksi/simpan', [TransaksiController::class, 'store'])
+            ->name('transaksi.simpan');
+
+        // Detail transaksi
+        Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])
+            ->name('transaksi.show');
+
+        // Batalkan transaksi
+        Route::post('/transaksi/{id}/batal', [TransaksiController::class, 'batal'])
+            ->name('transaksi.batal');
+
+        // Cetak struk
+        Route::get('/struk/{id}', [TransaksiController::class, 'struk'])
+            ->name('struk');
+    });
