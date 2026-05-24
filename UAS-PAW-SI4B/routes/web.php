@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\CustomerController;
 use App\Http\Controllers\CustomerMenuController;
@@ -53,3 +53,8 @@ Route::prefix('kasir')
         Route::get('/struk/{id}', [TransaksiController::class, 'struk'])
             ->name('struk');
     });
+
+    // Rute Autentikasi Pegawai (Login & Logout)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

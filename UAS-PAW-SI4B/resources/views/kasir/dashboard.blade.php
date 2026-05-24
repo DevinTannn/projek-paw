@@ -1,4 +1,4 @@
-@extends('kasir.layouts.kasir')
+@extends('layout.kasir')
 
 @section('title', 'Dashboard Kasir')
 @section('page-title', 'Dashboard Kasir')
