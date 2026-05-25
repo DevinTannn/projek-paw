@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,14 +12,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Bikin akun Admin
+        User::create([
+            'name' => 'Admin Utama',
+            'email' => 'admin@padmamula.com',
+            'password' => bcrypt('admin'),
+            // 'role' => 'admin' // (Buka komentar ini kalau kolom role sudah ada)
+        ]);
 
+        // 2. Bikin akun Kasir
+        User::create([
+            'name' => 'Kasir Depan',
+            'email' => 'kasir@padmamula.com',
+            'password' => bcrypt('kasir'),
+            // 'role' => 'kasir' 
+        ]);
+
+        // 3. Bikin akun Test User bawaan Laravel
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
-        // Selipkan CustomerSeeder di sini
+        // 4. Memanggil seeder buatan temanmu
         $this->call([
             CustomerSeeder::class,
         ]);
