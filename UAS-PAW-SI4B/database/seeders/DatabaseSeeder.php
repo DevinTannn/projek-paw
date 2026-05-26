@@ -17,21 +17,22 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Utama',
             'email' => 'admin@padmamula.com',
             'password' => bcrypt('admin'),
-            // 'role' => 'admin' // (Buka komentar ini kalau kolom role sudah ada)
+            'role' => 'admin' // (Buka komentar ini kalau kolom role sudah ada)
         ]);
 
         // 2. Bikin akun Kasir
         User::create([
             'name' => 'Kasir Depan',
-            'email' => 'kasir@padmamula.com',
+            'email' => 'kasir@gmail.com',
             'password' => bcrypt('kasir'),
-            // 'role' => 'kasir' 
+            'role' => 'kasir' 
         ]);
 
         // 3. Bikin akun Test User bawaan Laravel
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role' => 'customer'
         ]);
 
         // 4. Memanggil seeder buatan temanmu
