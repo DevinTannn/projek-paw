@@ -2,6 +2,8 @@
 @section('title', 'Pesan Sajian Istimewa')
 @section('content')
 
+
+
 <!-- ==================== TAMPILAN AWAL / HEADER MENU ==================== -->
 <div class="menu-header-section bg-white pt-4 pb-3 mb-4 border-bottom shadow-sm">
     <div class="container px-3 text-center"> <!-- Ditengah untuk identitas resto -->
@@ -45,6 +47,7 @@
             @endforeach
         </div>
     </div>
+    
 
     <!-- Looping Kategori & Menu dari Database -->
     @foreach($categories as $category)

@@ -36,7 +36,22 @@
     <main class="flex-grow pb-24 md:pb-8">
         @yield('content')
     </main>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen text-align-justify">
 
+    <div class="fixed top-4 right-1/2 z-[100]">
+        @guest
+            <a href="{{ route('login') }}" class="flex items-center gap-2 bg-white/90 backdrop-blur text-slate-600 hover:text-orange-500 px-4 py-2 rounded-full shadow-md text-xs font-bold border border-slate-200 transition-all">
+                <i class="fa-solid fa-lock"></i> Login
+            </a>
+        @endguest
+
+        @auth
+            <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('kasir.dashboard') }}" class="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-full shadow-md text-xs font-bold hover:scale-105 transition-transform">
+                Dashboard 🚀
+            </a>
+        @endauth
+    </div>
+    @include('App.customer-navbar')
     <!-- Bottom Navigation (Hanya muncul di HP/Mobile - md:hidden) -->
     <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] md:hidden z-50">
         <div class="flex justify-around items-center py-3">

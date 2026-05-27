@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         // 1. Bikin akun Admin
         User::create([
             'name' => 'Admin Utama',
-            'email' => 'admin@padmamula.com',
+            'email' => 'admin@gmail.com',
             'password' => bcrypt('admin'),
             'role' => 'admin' // (Buka komentar ini kalau kolom role sudah ada)
         ]);
