@@ -9,8 +9,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    // HAPUS ATAU KOMENTARI BARIS INI JIKA ADA:
-    // protected $table = 'kategori'; 
+    protected $fillable = ['name'];
 
     public function menus()
     {

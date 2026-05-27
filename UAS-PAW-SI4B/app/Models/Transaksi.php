@@ -9,6 +9,8 @@ class Transaksi extends Model
 {
     use HasFactory;
 
+    protected $table = 'transaksis';
+
     protected $fillable = [
         'kasir_id',
         'kode_transaksi',
@@ -18,6 +20,8 @@ class Transaksi extends Model
         'metode_bayar',
         'status',
         'catatan',
+        'is_edited',    
+        'catatan_edit',
     ];
 
     protected $casts = [

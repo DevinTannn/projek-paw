@@ -15,7 +15,7 @@
                 <div class="text-muted small">
                     {{ $transaksi->created_at->isoFormat('dddd, D MMMM Y · HH:mm') }}
                 </div>
-                <div class="text-muted small">Kasir: {{ $transaksi->kasir->name }}</div>
+                <div class="text-muted small">Kasir: {{ $transaksi->kasir->name ?? 'Pelanggan (E-Menu)' }}</div>
             </div>
             <span class="badge rounded-pill px-3 py-2 badge-{{ $transaksi->status }} fs-6">
                 {{ ucfirst($transaksi->status) }}
@@ -35,7 +35,7 @@
                 @foreach ($transaksi->details as $detail)
                 <tr>
                     <td>
-                        {{ $detail->menu->name }}  {{-- kolom teman: name --}}
+                        {{ $detail->menu->name ?? 'Menu Terhapus / Tidak Ditemukan' }}
                         @if ($detail->catatan_item)
                             <div class="text-muted small">📝 {{ $detail->catatan_item }}</div>
                         @endif
@@ -77,21 +77,35 @@
         @endif
 
     </div>
-    <div class="card-footer bg-transparent d-flex gap-2 justify-content-end">
-        <a href="{{ route('kasir.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+    
+    {{-- ── CARD FOOTER: Penempatan Tombol Aksi Kasir ── --}}
+    <div class="card-footer bg-transparent d-flex gap-2 justify-content-end align-items-center">
+        <a href="{{ route('kasir.index') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
+        
         <a href="{{ route('kasir.struk', $transaksi->id) }}" class="btn btn-hijau btn-sm">
             <i class="bi bi-printer"></i> Cetak Struk
         </a>
+
         @if ($transaksi->status === 'pending')
-        <form action="{{ route('kasir.transaksi.batal', $transaksi->id) }}" method="POST"
-              onsubmit="return confirm('Batalkan transaksi ini?')">
-            @csrf
-            <button type="submit" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-x-circle"></i> Batalkan
-            </button>
-        </form>
+            {{-- Form Tombol Selesaikan Transaksi --}}
+            <form action="{{ route('kasir.transaksi.selesai', $transaksi->id) }}" method="POST"
+                  onsubmit="return confirm('Selesaikan transaksi ini?')">
+                @csrf
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-check-circle"></i> Selesaikan
+                </button>
+            </form>
+
+            {{-- Form Tombol Batalkan Transaksi --}}
+            <form action="{{ route('kasir.transaksi.batal', $transaksi->id) }}" method="POST"
+                  onsubmit="return confirm('Batalkan transaksi ini?')">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-x-circle"></i> Batalkan
+                </button>
+            </form>
         @endif
     </div>
 </div>

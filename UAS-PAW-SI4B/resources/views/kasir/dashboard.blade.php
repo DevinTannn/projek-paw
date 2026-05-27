@@ -1,4 +1,4 @@
-@extends('layout.kasir')
+@extends('kasir.layouts.kasir')
 
 @section('title', 'Dashboard Kasir')
 @section('page-title', 'Dashboard Kasir')
@@ -49,7 +49,7 @@
 </div>
 
 {{-- ── Tabel Transaksi Hari Ini ── --}}
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Transaksi Hari Ini</h6>
@@ -108,4 +108,55 @@
     </div>
 </div>
 
+{{-- ── Area Pesanan Pelanggan (Pending) ── --}}
+<div class="card mb-4 border-warning shadow-sm">
+    <div class="card-header bg-warning text-white fw-bold">
+        <i class="bi bi-hourglass-split me-2"></i> Pesanan Pelanggan (Pending: {{ $pesananPending->count() }})
+    </div>
+    <div class="card-body">
+        @if ($pesananPending->isEmpty())
+            <p class="text-center text-muted my-3">Tidak ada pesanan masuk dari pelanggan.</p>
+        @else
+            <div class="row g-3">
+                @foreach ($pesananPending as $p)
+                <div class="col-md-4">
+                    <div class="card h-100 border-warning">
+                        <div class="card-body">
+                            <h6 class="fw-bold">Meja: {{ $p->table_number ?? '-' }}</h6>
+                            <small class="text-muted">{{ $p->kode_transaksi }}</small>
+                            
+                            <ul class="list-unstyled mt-2 small border-top pt-2">
+                                @foreach ($p->details as $d)
+                                    <li>{{ $d->qty }}x {{ $d->menu->name ?? 'Menu Terhapus' }}</li>
+                                @endforeach
+                            </ul>
+
+                            {{-- Menampilkan Catatan Pelanggan (Jika Ada) --}}
+                            @if($p->catatan)
+                                <div class="alert alert-info p-2 small mt-2">
+                                    <strong>Catatan:</strong> {{ $p->catatan }}
+                                </div>
+                            @endif
+
+                            <div class="fw-bold mt-2 text-danger">Total: Rp {{ number_format($p->total_harga, 0, ',', '.') }}</div>
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                {{-- Tombol Detail --}}
+                                <a href="{{ route('kasir.transaksi.show', $p->id) }}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                    Detail
+                                </a>
+                                {{-- Tombol Selesaikan --}}
+                                <form action="{{ route('kasir.transaksi.selesai', $p->id) }}" method="POST" class="flex-grow-1">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success w-100 btn-sm">Selesaikan</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+</div>
 @endsection
