@@ -52,6 +52,10 @@
            class="nav-link {{ request()->routeIs('kasir.transaksi.buat') ? 'active' : '' }}">
             <i class="bi bi-cart-plus"></i> Transaksi Baru
         </a>
+        <a href="{{ route('kasir.transaksi.pending') }}"
+           class="nav-link {{ request()->routeIs('kasir.transaksi.pending') ? 'active' : '' }}">
+            <i class="bi bi-hourglass-split"></i> Pesanan Pending
+        </a>
     </nav>
     <div class="mt-auto p-3">
         <div class="text-white-50 small mb-1">{{ Auth::user()->name }}</div>

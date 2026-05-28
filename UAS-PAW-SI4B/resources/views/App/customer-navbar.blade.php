@@ -11,27 +11,36 @@
         </div>
 
         <div class="flex items-center space-x-3">
-            <button onclick="panggilPelayan()" 
-                    aria-label="Panggil Pelayan"
-                    class="flex items-center space-x-1.5 px-3 py-2 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg hover:bg-amber-100 active:scale-95 transition-all border border-amber-100">
-                <i class="fa-solid fa-bell text-amber-600" aria-hidden="true"></i>
-                <span class="hidden sm:inline">Panggil Pelayan</span>
+            {{-- Tombol Panggil Pelayan --}}
+            <button onclick="panggilPelayan()" class="flex items-center space-x-1.5 px-3 py-2 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg hover:bg-amber-100 transition-all border border-amber-100">
+                <i class="fa-solid fa-bell text-amber-600"></i>
+                <span class="hidden sm:inline">Panggil</span>
             </button>
 
-            <a href="{{ route('cart.index') }}" class="relative p-2.5 text-slate-600 hover:text-orange-600 hover:bg-slate-50 rounded-xl transition-all">
+            {{-- TOMBOL LOGIN / DASHBOARD (DITAMBAHKAN KEMBALI) --}}
+            @guest
+                <a href="{{ route('login') }}" class="text-xs font-bold text-slate-600 hover:text-orange-600">
+                    Login
+                </a>
+            @endguest
+
+            @auth
+                <a href="{{ Auth::user()->role === 'admin' ? route('admin.dashboard') : route('kasir.dashboard') }}" 
+                   class="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 transition-all">
+                    Dashboard
+                </a>
+            @endauth
+
+            {{-- Keranjang --}}
+            <a href="{{ route('cart.index') }}" class="relative p-2.5 text-slate-600 hover:text-orange-600 transition-all">
                 <i class="fa-solid fa-basket-shopping text-xl"></i>
-                
                 @php
-                    // Menghitung jumlah awal dari session saat halaman pertama dimuat
                     $cartCount = array_sum(session()->get('cart', []));
                 @endphp
-
-                <span id="desktop-cart-badge" 
-                      class="absolute top-1 right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $cartCount > 0 ? '' : 'hidden' }}">
+                <span id="desktop-cart-badge" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $cartCount > 0 ? '' : 'hidden' }}">
                     {{ $cartCount }}
                 </span>
             </a>
         </div>
-
     </div>
 </header>

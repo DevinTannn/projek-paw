@@ -63,39 +63,40 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input data yang dikirim dari modal detail pesanan pelanggan
+        // 1. Validasi: table_number sekarang opsional (nullable) 
+        // karena kita mewajibkan customer_name sebagai alternatif
         $request->validate([
-            'table_number' => 'required|numeric',
-            'metode_bayar' => 'required|string',
-            'catatan'      => 'nullable|string',
+            'table_number'  => 'nullable|numeric',
+            'customer_name' => 'required|string|max:255',
+            'metode_bayar'  => 'required|string',
+            'catatan'       => 'nullable|string',
         ]);
 
         $cart = session()->get('cart', []);
         if (empty($cart)) return back()->with('error', 'Keranjang kosong!');
 
-        // Membungkus proses simpan dengan DB Transaction agar aman jika terjadi error di tengah jalan
         DB::transaction(function () use ($cart, $request) {
-            // 1. Hitung Total Harga
             $totalHarga = 0;
             foreach ($cart as $id => $qty) {
                 $menu = Menu::find($id);
                 if ($menu) $totalHarga += ($menu->price * $qty);
             }
 
-            // 2. Simpan Transaksi dengan menangkap data request dari modal pelanggan
+            // 2. Simpan Transaksi dengan menambahkan customer_name
             $transaksi = Transaksi::create([
-                'kasir_id'       => null, // Null karena pesanan datang mandiri dari pelanggan via web
-                'table_number'   => $request->table_number, // FIXED: Menyimpan nomor meja dari modal
-                'kode_transaksi' => Transaksi::generateKode(), // Generate otomatis kode unik transaksi
+                'kasir_id'       => null, 
+                'table_number'   => $request->table_number, 
+                'customer_name'  => $request->customer_name, // <-- TAMBAHKAN INI
+                'kode_transaksi' => Transaksi::generateKode(),
                 'total_harga'    => $totalHarga,
                 'total_bayar'    => $totalHarga, 
                 'kembalian'      => 0,
-                'metode_bayar'   => $request->metode_bayar, // FIXED: Menyimpan metode bayar (tunai/qris) dari modal
-                'status'         => 'pending', // Masuk ke status pending supaya nampil di dashboard kasir
-                'catatan'        => $request->catatan, // FIXED: Menyimpan catatan dari modal pelanggan
+                'metode_bayar'   => $request->metode_bayar,
+                'status'         => 'pending',
+                'catatan'        => $request->catatan,
             ]);
 
-            // 3. Simpan Detail Transaksi untuk setiap item menu di keranjang
+            // 3. Simpan Detail Transaksi
             foreach ($cart as $id => $qty) {
                 $menu = Menu::find($id);
                 if ($menu) {
@@ -105,15 +106,12 @@ class CartController extends Controller
                         'qty'          => $qty,
                         'harga_satuan' => $menu->price,
                         'subtotal'     => ($qty * $menu->price),
-                        'catatan_item' => null,
                     ]);
                 }
             }
         });
 
-        // Hapus data keranjang dari session setelah pesanan sukses disimpan
         session()->forget('cart');
-        
         return redirect('/')->with('success', 'Pesanan berhasil dikirim ke kasir!');
     }
 }

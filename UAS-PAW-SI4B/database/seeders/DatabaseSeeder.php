@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Utama',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('admin'),
-            'role' => 'admin' // (Buka komentar ini kalau kolom role sudah ada)
+            'role' => 'admin'
         ]);
 
         // 2. Bikin akun Kasir
@@ -35,9 +35,10 @@ class DatabaseSeeder extends Seeder
             'role' => 'customer'
         ]);
 
-        // 4. Memanggil seeder buatan temanmu
+        // 4. Memanggil seeder
         $this->call([
-            CustomerSeeder::class,
+            CategorySeeder::class, // Tambahkan di sini
+            // CustomerSeeder::class, // Hapus atau beri komentar jika tidak dipakai
         ]);
     }
 }

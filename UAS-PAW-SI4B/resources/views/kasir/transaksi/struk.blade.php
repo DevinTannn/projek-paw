@@ -15,7 +15,7 @@
         .line   { border-top: 1px dashed #999; margin: 8px 0; }
         .row    { display: flex; justify-content: space-between; }
         .nama-toko { font-size: 15px; font-weight: bold; }
-        .item-row  { display: flex; justify-content: space-between; margin: 3px 0; }
+        .item-row  { display: flex; justify-content: space-between; margin: 6px 0; }
         .item-row .kiri  { flex: 1; }
         .item-row .kanan { text-align: right; white-space: nowrap; }
         .btn-cetak {
@@ -38,7 +38,7 @@
 <body>
 <div class="struk">
 
-    <div class="center mb-2">
+    <div class="center" style="margin-bottom: 8px;">
         <div class="nama-toko">🌿 Rumah Makan Vegetarian</div>
         <div style="color:#555">Sehat, Lezat, Berkah</div>
     </div>
@@ -46,14 +46,19 @@
 
     <div class="row"><span>No.</span><span class="bold">{{ $transaksi->kode_transaksi }}</span></div>
     <div class="row"><span>Tanggal</span><span>{{ $transaksi->created_at->format('d/m/Y H:i') }}</span></div>
-    <div class="row"><span>Kasir</span><span>{{ $transaksi->kasir->name }}</span></div>
+    {{-- Menggunakan null-safe operator agar tidak error jika kasir kosong --}}
+    <div class="row"><span>Kasir</span><span>{{ $transaksi->kasir?->name ?? 'Admin' }}</span></div>
     <div class="line"></div>
 
     @foreach ($transaksi->details as $detail)
     <div class="item-row">
         <div class="kiri">
-            <div>{{ $detail->menu->name }}</div>  {{-- kolom teman: name --}}
-            <div style="color:#777">{{ $detail->qty }} × Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</div>
+            {{-- Menampilkan Nama Menu & Deskripsi jika ada --}}
+            <div class="bold">{{ $detail->menu?->name ?? 'Menu tidak ditemukan' }}</div> 
+            @if(!empty($detail->menu?->description))
+                <div style="color:#777; font-size: 10px;">{{ $detail->menu->description }}</div>
+            @endif
+            <div style="color:#555">{{ $detail->qty }} × Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</div>
         </div>
         <div class="kanan bold">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</div>
     </div>
@@ -66,7 +71,7 @@
         <span>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
     </div>
     <div class="row" style="margin-top:4px">
-        <span>Bayar ({{ strtoupper($transaksi->metode_bayar) }})</span>
+        <span>Bayar ({{ strtoupper($transaksi->metode_bayar ?? 'TUNAI') }})</span>
         <span>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</span>
     </div>
     <div class="row">

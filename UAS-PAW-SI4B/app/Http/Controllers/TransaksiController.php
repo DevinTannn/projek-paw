@@ -16,31 +16,28 @@ class TransaksiController extends Controller
     // ── GET /kasir/dashboard ──────────────────────────────────
     public function index()
     {
-        // 1. Transaksi selesai untuk tabel hari ini
+        // Transaksi Selesai (tabel bawah)
         $transaksiHariIni = Transaksi::with('details')
             ->whereDate('created_at', today())
             ->where('status', 'selesai')
             ->orderByDesc('created_at')
             ->get();
 
-        // 2. Data untuk statistik
+        // Statistik
         $totalPendapatan = $transaksiHariIni->sum('total_harga');
         $totalTransaksi = $transaksiHariIni->count();
-
-        // 3. Pesanan Pending (Ini yang Anda butuhkan untuk ditampilkan)
+        
+        // Pesanan Pending (Dibatasi 5 untuk Dashboard Utama)
         $pesananPending = Transaksi::with(['details.menu'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
+            ->limit(5) 
             ->get();
             
-        $transaksiPending = $pesananPending->count();
+        $transaksiPending = Transaksi::where('status', 'pending')->count();
 
         return view('kasir.dashboard', compact(
-            'transaksiHariIni',
-            'totalPendapatan',
-            'totalTransaksi',
-            'transaksiPending',
-            'pesananPending' // Kirim data ini ke view
+            'transaksiHariIni', 'totalPendapatan', 'totalTransaksi', 'transaksiPending', 'pesananPending'
         ));
     }
 
@@ -135,11 +132,21 @@ class TransaksiController extends Controller
     }
 
     // ── TAMBAHAN UNTUK HISTORI ───────────────────────────────
-    public function history()
+    public function history(Request $request)
     {
-        $transaksi = Transaksi::with(['details.menu', 'kasir'])
-                     ->orderByDesc('created_at')
-                     ->get();
+        // Gunakan Query Builder agar bisa ditambah filter
+        $query = Transaksi::with(['details.menu', 'kasir']);
+
+        // Logika Filter Status
+        if ($request->has('status') && !empty($request->status)) {
+            if ($request->status == 'diubah') {
+                $query->where('is_edited', true);
+            } else {
+                $query->where('status', $request->status);
+            }
+        }
+
+        $transaksi = $query->orderByDesc('created_at')->get();
 
         if (Auth::user()->role === 'admin') {
             return view('admin.transaksi.history', compact('transaksi'));
@@ -167,6 +174,7 @@ class TransaksiController extends Controller
         // Update data
         $transaksi->update([
             'total_harga'  => $request->total_harga,
+            'status'       => 'diubah',
             'is_edited'    => true,
             'catatan_edit' => $request->catatan_edit . ' | Diubah oleh Admin pada ' . now()
         ]);
@@ -185,11 +193,42 @@ class TransaksiController extends Controller
         return view('kasir.dashboard', compact('pesananPending'));
     }
 
-    public function selesai($id)
+    public function selesai(Request $request, $id)
     {
         $transaksi = \App\Models\Transaksi::findOrFail($id);
-        $transaksi->update(['status' => 'selesai']);
         
-        return redirect()->route('kasir.index')->with('success', 'Pesanan berhasil diselesaikan!');
+        // Jika metode BUKAN tunai, kita set totalBayar = total_harga
+        // Jika tunai, gunakan input dari form
+        $isNonTunai = in_array($transaksi->metode_bayar, ['qris', 'transfer']);
+        
+        $totalBayar = $isNonTunai ? $transaksi->total_harga : $request->total_bayar;
+
+        // Validasi hanya jika tunai
+        if (!$isNonTunai) {
+            $request->validate([
+                'total_bayar' => 'required|numeric|min:' . $transaksi->total_harga,
+            ], [
+                'total_bayar.min' => 'Uang yang dibayarkan kurang dari total tagihan!'
+            ]);
+        }
+
+        $transaksi->update([
+            'total_bayar' => $totalBayar,
+            'kembalian'   => $totalBayar - $transaksi->total_harga,
+            'status'      => 'selesai'
+        ]);
+        
+        return redirect()->route('kasir.transaksi.pending')
+                        ->with('success', 'Pesanan berhasil diselesaikan!');
+    }
+
+    public function daftarPending()
+    {
+        $pesananPending = Transaksi::with(['details.menu'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('kasir.transaksi.pending', compact('pesananPending'));
     }
 }

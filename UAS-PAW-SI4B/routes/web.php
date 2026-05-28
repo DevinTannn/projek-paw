@@ -38,13 +38,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // 3. --- GRUP RUANGAN KASIR ---
 Route::prefix('kasir')
     ->middleware(['auth', 'role:kasir'])
-    ->name('kasir.') // Semua rute di dalam grup ini otomatis diawali 'kasir.'
+    ->name('kasir.')
     ->group(function () {
         
-        // FIX AMAN: Mendaftarkan rute untuk 'kasir.index' DAN 'kasir.dashboard' sekaligus 
-        // agar tidak terjadi bentrok di file view/sidebar/controller Anda.
         Route::get('/dashboard', [TransaksiController::class, 'index'])->name('index');
         Route::get('/main-dashboard', [TransaksiController::class, 'index'])->name('dashboard');
+        
+        // --- TAMBAHAN RUTE PENDING ---
+        Route::get('/transaksi/pending', [TransaksiController::class, 'daftarPending'])->name('transaksi.pending');
         
         // Rute Transaksi
         Route::get('/transaksi/buat', [TransaksiController::class, 'create'])->name('transaksi.buat');
@@ -54,7 +55,7 @@ Route::prefix('kasir')
         
         Route::get('/transaksi/history', [TransaksiController::class, 'history'])->name('transaksi.history');
         
-        // URL & Nama rute disebelah sini sudah bersih dari double prefix 'kasir'
+        // Rute Selesai & Panggil (Panggilan pelayan selesai ditandai dengan rute yang sama)
         Route::post('/transaksi/{id}/selesai', [TransaksiController::class, 'selesai'])->name('transaksi.selesai');
         
         // Rute Struk
