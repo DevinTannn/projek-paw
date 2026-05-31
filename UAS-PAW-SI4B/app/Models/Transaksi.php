@@ -38,11 +38,6 @@ class Transaksi extends Model
         return $this->belongsTo(User::class, 'kasir_id');
     }
 
-    public function details()
-    {
-        return $this->hasMany(DetailTransaksi::class);
-    }
-
     // ── Helper ───────────────────────────────────────────────
     /**
      * Generate kode transaksi unik, contoh: TRX-20240523-001
@@ -55,5 +50,16 @@ class Transaksi extends Model
                        ->first();
         $urutan  = $last ? ((int) substr($last->kode_transaksi, -3)) + 1 : 1;
         return $prefix . str_pad($urutan, 3, '0', STR_PAD_LEFT);
+    }
+
+    public function details()
+    {
+        return $this->detailTransaksi();
+    }
+    
+    public function detailTransaksi()
+    {
+        // Satu transaksi memiliki banyak detail transaksi
+        return $this->hasMany(DetailTransaksi::class, 'transaksi_id', 'id');
     }
 }

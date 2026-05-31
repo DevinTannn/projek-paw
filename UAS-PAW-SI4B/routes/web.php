@@ -24,6 +24,8 @@ Route::post('/keranjang/update', [CartController::class, 'update']);
 // Tambahkan di bawah rute keranjang yang sudah ada
 Route::post('/keranjang/pesan', [CartController::class, 'store'])->name('cart.store');
 
+Route::get('/struk/{id}', [CustomerMenuController::class, 'struk'])->name('customer.struk');
+
 // Simulasi scan QR
 Route::get('/meja/{nomor_meja}', function ($nomor_meja) {
     session(['table_number' => $nomor_meja]);

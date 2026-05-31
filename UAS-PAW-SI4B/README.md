@@ -1,58 +1,54 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+E-Menu PADMAMULA
+E-Menu Padmamula adalah aplikasi sistem pemesanan menu digital yang dirancang untuk mempermudah pelanggan dalam melihat menu, melakukan pemesanan langsung dari meja, serta mencetak bukti transaksi (struk) secara otomatis.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+🚀 Fitur Utama
+Katalog Menu Digital: Tampilan daftar menu yang rapi dengan pengelompokan kategori.
 
-## About Laravel
+Sistem Keranjang: Memungkinkan pelanggan menambah, mengupdate, dan menghapus item pesanan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Checkout & Validasi: Proses pemesanan dengan verifikasi data pelanggan dan nomor meja yang wajib diisi.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Struk Digital: Hasil pesanan dapat dilihat langsung, di-download dalam format PDF, atau dicetak (print) secara instan.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Metode Pembayaran: Mendukung opsi pembayaran Tunai, QRIS, dan Transfer.
 
-## Learning Laravel
+🛠 Teknologi yang Digunakan
+Framework: Laravel 10/11
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Frontend: Bootstrap 5 & Tailwind CSS
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Database: MySQL
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+PDF Engine: barryvdh/laravel-dompdf
 
-## Agentic Development
+Ikon: Bootstrap Icons & FontAwesome
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+📋 Panduan Instalasi & Setup Lengkap
+Untuk menjalankan proyek ini di perangkat baru (lokal/server), ikuti langkah-langkah berikut secara berurutan:
 
-```bash
-composer require laravel/boost --dev
+1. Clone & Persiapan Awal
+git clone [URL-REPOSITORY-ANDA]
+cd nama-proyek
 
-php artisan boost:install
-```
+2. Install Dependencies
+Jalankan perintah berikut untuk mengunduh semua kebutuhan sistem (PHP & JavaScript):
+composer install
+npm install
+npm run dev
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+3. Konfigurasi Lingkungan
+Copy file contoh .env dan buat kunci aplikasi:
+cp .env.example .env
+php artisan key:generate
+Setelah itu, buka file .env dan atur konfigurasi DB_DATABASE, DB_USERNAME, dan DB_PASSWORD sesuai dengan database di komputer Anda.
 
-## Contributing
+4. Database Migration
+Buat tabel-tabel yang diperlukan di database Anda:
+php artisan migrate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Storage Link (PENTING)
+Agar gambar menu muncul, Anda wajib membuat symbolic link agar folder storage terhubung ke folder public:
+php artisan storage:link
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. Jalankan Server
+php artisan serve

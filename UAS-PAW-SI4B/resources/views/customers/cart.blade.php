@@ -43,14 +43,15 @@
 <div id="orderModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-all">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl animate-fade-in">
         <h2 class="text-xl font-bold mb-4 text-slate-800">Detail Pesanan</h2>
+        
         <form action="{{ route('cart.store') }}" method="POST" id="orderForm">
             @csrf
             <div class="space-y-4">
-                {{-- Input Nomor Meja --}}
+                {{-- Input Nomor Meja (Wajib Diisi) --}}
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700">Nomor Meja</label>
-                    <input type="number" name="table_number" id="table_number" value="{{ session('table_number') }}" 
-                           class="w-full border border-slate-200 rounded-lg p-2 mt-1" placeholder="Kosongkan jika tidak ada">
+                    <label class="block text-sm font-semibold text-slate-700">Nomor Meja <span class="text-red-500">*</span></label>
+                    <input type="number" name="table_number" id="table_number" required
+                           class="w-full border border-slate-200 rounded-lg p-2 mt-1" placeholder="Masukkan nomor meja Anda">
                 </div>
 
                 {{-- Input Nama Pemesan --}}
@@ -89,12 +90,17 @@
     function openModal() { document.getElementById('orderModal').classList.remove('hidden'); }
     function closeModal() { document.getElementById('orderModal').classList.add('hidden'); }
 
-    // Validasi sederhana: pastikan minimal ada nama
+    // Validasi JavaScript untuk memastikan Nama dan Nomor Meja terisi
     document.getElementById('orderForm').addEventListener('submit', function(e) {
-        const name = document.getElementById('customer_name').value;
-        if (!name.trim()) {
+        const name = document.getElementById('customer_name').value.trim();
+        const table = document.getElementById('table_number').value.trim();
+
+        if (!name) {
             e.preventDefault();
             alert("Nama Pemesan wajib diisi!");
+        } else if (!table) {
+            e.preventDefault();
+            alert("Nomor Meja wajib diisi!");
         }
     });
 </script>
