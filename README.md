@@ -13,9 +13,9 @@ Struk Digital: Hasil pesanan dapat dilihat langsung, di-download dalam format PD
 Metode Pembayaran: Mendukung opsi pembayaran Tunai, QRIS, dan Transfer.
 
 🛠 Teknologi yang Digunakan
-Framework: Laravel 10/11
+Framework: Laravel
 
-Frontend: Bootstrap 5 & Tailwind CSS
+Frontend: Bootstrap 5
 
 Database: MySQL
 
