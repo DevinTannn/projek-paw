@@ -28,13 +28,6 @@ class DatabaseSeeder extends Seeder
             'role' => 'kasir' 
         ]);
 
-        // 3. Bikin akun Test User bawaan Laravel
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role' => 'customer'
-        ]);
-
         // 4. Memanggil seeder
         $this->call([
             CategorySeeder::class, // Tambahkan di sini

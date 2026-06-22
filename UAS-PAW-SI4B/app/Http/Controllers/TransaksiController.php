@@ -16,18 +16,16 @@ class TransaksiController extends Controller
     // ── GET /kasir/dashboard ──────────────────────────────────
     public function index()
     {
-        // Transaksi Selesai (tabel bawah)
+        // Pastikan 'details' dimuat agar sum('qty') bisa bekerja di Blade
         $transaksiHariIni = Transaksi::with('details')
             ->whereDate('created_at', today())
             ->where('status', 'selesai')
             ->orderByDesc('created_at')
             ->get();
 
-        // Statistik
         $totalPendapatan = $transaksiHariIni->sum('total_harga');
-        $totalTransaksi = $transaksiHariIni->count();
+        $totalTransaksi  = $transaksiHariIni->count();
         
-        // Pesanan Pending (Dibatasi 5 untuk Dashboard Utama)
         $pesananPending = Transaksi::with(['details.menu'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
@@ -57,7 +55,7 @@ class TransaksiController extends Controller
             $itemsData  = [];
 
             foreach ($request->items as $item) {
-                $menu       = Menu::findOrFail($item['menu_id']);
+                $menu      = Menu::findOrFail($item['menu_id']);
                 $subtotal  = $menu->price * $item['qty'];   
                 $totalHarga += $subtotal;
 
@@ -66,26 +64,27 @@ class TransaksiController extends Controller
                     'qty'          => $item['qty'],
                     'harga_satuan' => $menu->price,
                     'subtotal'     => $subtotal,
-                    'catatan_item' => $item['catatan_item'] ?? null,
                 ];
             }
 
-            $kembalian = $request->total_bayar - $totalHarga;
-            if ($kembalian < 0) {
-                return back()
-                    ->withErrors(['total_bayar' => 'Jumlah bayar kurang dari total harga.'])
-                    ->withInput();
-            }
+            // --- UBAH DI SINI ---
+            // Paksa status jadi 'selesai' agar tidak masuk antrean pending
+            $statusAwal = 'selesai'; 
+            
+            // Pastikan total bayar minimal sama dengan total harga
+            $totalBayar = $request->total_bayar >= $totalHarga ? $request->total_bayar : $totalHarga;
+            $kembalian  = $totalBayar - $totalHarga;
 
             $transaksi = Transaksi::create([
                 'kasir_id'       => Auth::id(),
                 'kode_transaksi' => Transaksi::generateKode(),
                 'total_harga'    => $totalHarga,
-                'total_bayar'    => $request->total_bayar,
+                'total_bayar'    => $totalBayar,
                 'kembalian'      => $kembalian,
                 'metode_bayar'   => $request->metode_bayar,
-                'status'         => 'selesai',
+                'status'         => $statusAwal, // Selalu selesai
                 'catatan'        => $request->catatan,
+                'tipe_transaksi' => $request->tipe_transaksi ?? 'kasir', // Simpan tipe transaksi
             ]);
 
             foreach ($itemsData as &$d) {
@@ -94,15 +93,14 @@ class TransaksiController extends Controller
             DetailTransaksi::insert($itemsData);
 
             DB::commit();
-            return redirect()
-                ->route('kasir.struk', $transaksi->id)
-                ->with('success', 'Transaksi berhasil disimpan!');
+
+            // Redirect langsung ke halaman struk
+            return redirect()->route('kasir.struk', $transaksi->id)
+                ->with('success', 'Transaksi berhasil diproses!');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()
-                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])
-                ->withInput();
+            return back()->withErrors(['error' => 'Gagal: ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -137,13 +135,18 @@ class TransaksiController extends Controller
         // Gunakan Query Builder agar bisa ditambah filter
         $query = Transaksi::with(['details.menu', 'kasir']);
 
-        // Logika Filter Status
+        // 1. Logika Filter Status
         if ($request->has('status') && !empty($request->status)) {
             if ($request->status == 'diubah') {
                 $query->where('is_edited', true);
             } else {
                 $query->where('status', $request->status);
             }
+        }
+
+        // 2. LOGIKA BARU: Filter Berdasarkan Tanggal
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $query->whereDate('created_at', $request->tanggal);
         }
 
         $transaksi = $query->orderByDesc('created_at')->get();
@@ -195,21 +198,18 @@ class TransaksiController extends Controller
 
     public function selesai(Request $request, $id)
     {
-        $transaksi = \App\Models\Transaksi::findOrFail($id);
-        
-        // Jika metode BUKAN tunai, kita set totalBayar = total_harga
-        // Jika tunai, gunakan input dari form
-        $isNonTunai = in_array($transaksi->metode_bayar, ['qris', 'transfer']);
-        
-        $totalBayar = $isNonTunai ? $transaksi->total_harga : $request->total_bayar;
-
-        // Validasi hanya jika tunai
-        if (!$isNonTunai) {
+        $transaksi = Transaksi::findOrFail($id);
+        if ($transaksi->metode_bayar === 'tunai') {
+            // Validasi di sini: Jika input < total_harga, proses akan berhenti
             $request->validate([
                 'total_bayar' => 'required|numeric|min:' . $transaksi->total_harga,
             ], [
-                'total_bayar.min' => 'Uang yang dibayarkan kurang dari total tagihan!'
+                'total_bayar.min' => 'Uang yang dibayarkan kurang dari total tagihan!',
             ]);
+            
+            $totalBayar = $request->total_bayar;
+        } else {
+            $totalBayar = $transaksi->total_harga;
         }
 
         $transaksi->update([
@@ -218,8 +218,7 @@ class TransaksiController extends Controller
             'status'      => 'selesai'
         ]);
         
-        return redirect()->route('kasir.transaksi.pending')
-                        ->with('success', 'Pesanan berhasil diselesaikan!');
+        return redirect()->route('kasir.dashboard')->with('success', 'Transaksi selesai!');
     }
 
     public function daftarPending()

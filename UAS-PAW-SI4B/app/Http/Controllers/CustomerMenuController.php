@@ -23,16 +23,15 @@ class CustomerMenuController extends Controller
     }
 
     public function struk($id)
-{
-    $transaksi = \App\Models\Transaksi::with('detailTransaksi.menu')->findOrFail($id);
-    
-    // Jika ada request ?download=true, maka buat PDF
-    if (request()->has('download')) {
-        $pdf = Pdf::loadView('customers.struk', compact('transaksi'));
-        return $pdf->download('Struk_Pesanan_' . $transaksi->kode_transaksi . '.pdf');
-    }
+    {
+        $transaksi = \App\Models\Transaksi::with('detailTransaksi.menu')->findOrFail($id);
+        
+        // Jika ada request ?download=true, maka buat PDF dengan view khusus
+        if (request()->has('download')) {
+            $pdf = PDF::loadView('customers.pdf', compact('transaksi'));
+            return $pdf->download('Struk_Pesanan_' . $transaksi->kode_transaksi . '.pdf');
+        }
 
-    // Jika tidak, tampilkan view biasa
-    return view('customers.struk', compact('transaksi'));
-}
+        return view('customers.struk', compact('transaksi'));
+    }
 }

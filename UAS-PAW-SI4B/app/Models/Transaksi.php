@@ -24,6 +24,7 @@ class Transaksi extends Model
         'catatan',
         'is_edited',    
         'catatan_edit',
+        'tipe_transaksi',
     ];
 
     protected $casts = [

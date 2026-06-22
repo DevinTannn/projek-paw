@@ -9,14 +9,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AdminMenuController extends Controller {
-    public function index(Request $request  ) {
+    public function index(Request $request) 
+    {
         $query = Menu::with('category');
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
+
+        if ($request->filled('category')) {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('name', $request->category);
+            });
+        }
+    
+        $menus = $query->get();
         
-        $menus = Menu::with('category')->get();
         return view('admin.menus.index', compact('menus'));
     }
 

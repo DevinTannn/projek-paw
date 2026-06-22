@@ -151,5 +151,15 @@
         document.getElementById('label-total').textContent = 'Rp ' + fmt(totalGlobal);
         updatePembayaran();
     }
+
+    document.getElementById('formTransaksi').addEventListener('submit', function(e) {
+        const totalHarga = totalGlobal; 
+        const inputBayar = parseFloat(document.getElementById('input-bayar').value);
+
+        if (inputBayar < totalHarga) {
+            e.preventDefault(); // Batalkan submit
+            alert('Perhatian: Jumlah bayar tidak boleh kurang dari total harga!');
+        }
+    });
 </script>
 @endpush

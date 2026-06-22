@@ -64,6 +64,11 @@ class CartController extends Controller
             'catatan'       => 'nullable|string',
         ]);
 
+        \App\Models\Panggilan::create([
+            'no_meja' => $request->table_number ?? session('table_number') ?? 'Unknown',
+            'status'  => 'pending'
+        ]);
+
         $cart = session()->get('cart', []);
         if (empty($cart)) return back()->with('error', 'Keranjang kosong!');
 

@@ -6,95 +6,119 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'Dashboard Kasir') — Vegetarian</title>
 
-    {{-- Bootstrap 5 --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    {{-- Bootstrap Icons --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
     <style>
-        :root { --hijau: #2e7d32; --hijau-muda: #66bb6a; }
-        body { background: #f5f5f5; font-family: 'Segoe UI', sans-serif; }
-        .sidebar {
-            width: 240px; min-height: 100vh;
-            background: var(--hijau); position: fixed; top: 0; left: 0;
+        :root { 
+            --primary: #10b981; 
+            --sidebar-bg: #1e293b; 
+            --body-bg: #f8fafc;
         }
-        .sidebar .brand { padding: 20px 16px; color: #fff; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid #388e3c; }
-        .sidebar .nav-link { color: rgba(255,255,255,.8); padding: 10px 20px; border-radius: 8px; margin: 2px 8px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #388e3c; color: #fff; }
-        .sidebar .nav-link i { margin-right: 8px; }
-        .main-content { margin-left: 240px; padding: 24px; }
-        .topbar { background: #fff; border-radius: 12px; padding: 12px 20px; margin-bottom: 24px;
-                  display: flex; justify-content: space-between; align-items: center;
-                  box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-        .card { border: none; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
-        .btn-hijau { background: var(--hijau); color: #fff; border: none; }
-        .btn-hijau:hover { background: #1b5e20; color: #fff; }
-        .badge-selesai { background: #e8f5e9; color: #2e7d32; }
-        .badge-pending { background: #fff8e1; color: #f57f17; }
-        .badge-batal   { background: #ffebee; color: #c62828; }
-    </style>
+        body { background: var(--body-bg); font-family: 'Inter', system-ui, sans-serif; }
+        
+        .sidebar { 
+            width: 260px; background: var(--sidebar-bg); 
+            min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .brand { padding: 25px 20px; font-weight: 800; color: white; border-bottom: 1px solid #334155; letter-spacing: -0.5px; }
+        
+        .nav-link { 
+            color: #94a3b8; padding: 12px 20px; margin: 4px 15px; border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        
+        .main-content { margin-left: 260px; padding: 24px; }
+        
+        .topbar { 
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 16px 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;
+        }
 
-    @stack('styles')
+        .card { border: none; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        .menu-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important; }
+        
+        .user-profile { 
+            background: rgba(255,255,255,0.05); border-radius: 16px; padding: 15px; margin: 0 15px;
+        }
+    </style>
 </head>
 <body>
 
-{{-- ── Sidebar ── --}}
 <div class="sidebar d-flex flex-column">
-    <div class="brand">
-        <i class="bi bi-leaf-fill me-2"></i> Kasir Vegetarian
+    <div class="brand"><i class="bi bi-leaf-fill me-2"></i> Kasir Vegetarian</div>
+    <div class="px-4 pt-4 pb-2">
+        <h6 class="text-white mb-0 fw-bold">Halo, {{ Auth::user()->name }}! 👋</h6>
     </div>
-    <nav class="nav flex-column mt-3">
-        <a href="{{ route('kasir.dashboard') }}"
-           class="nav-link {{ request()->routeIs('kasir.dashboard') ? 'active' : '' }}">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-        <a href="{{ route('kasir.transaksi.buat') }}"
-           class="nav-link {{ request()->routeIs('kasir.transaksi.buat') ? 'active' : '' }}">
-            <i class="bi bi-cart-plus"></i> Transaksi Baru
-        </a>
-        <a href="{{ route('kasir.transaksi.pending') }}"
-           class="nav-link {{ request()->routeIs('kasir.transaksi.pending') ? 'active' : '' }}">
-            <i class="bi bi-hourglass-split"></i> Pesanan Pending
-        </a>
+
+    <nav class="nav flex-column mt-2">
+        <a href="{{ route('kasir.dashboard') }}" class="nav-link {{ request()->routeIs('kasir.dashboard') ? 'active' : '' }}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="{{ route('kasir.transaksi.buat') }}" class="nav-link {{ request()->routeIs('kasir.transaksi.buat') ? 'active' : '' }}"><i class="bi bi-cart-plus me-2"></i> Transaksi Baru</a>
+        <a href="{{ route('kasir.transaksi.pending') }}" class="nav-link {{ request()->routeIs('kasir.transaksi.pending') ? 'active' : '' }}"><i class="bi bi-hourglass-split me-2"></i> Pesanan Pending</a>
     </nav>
-    <div class="mt-auto p-3">
-        <div class="text-white-50 small mb-1">{{ Auth::user()->name }}</div>
+
+    <div class="mt-auto p-4">
+        <div class="user-profile d-flex align-items-center mb-3">
+            @if(Auth::user()->image_url)
+                <img src="{{ asset('storage/' . Auth::user()->image_url) }}?v={{ time() }}" class="rounded-3 me-3" style="width: 45px; height: 45px; object-fit: cover;">
+            @else
+                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: 800;">{{ strtoupper(substr(Auth::user()->name ?? 'K', 0, 1)) }}</div>
+            @endif
+            <div class="text-white">
+                <div class="fw-bold">{{ Auth::user()->name ?? 'Kasir' }}</div>
+                <div class="text-primary" style="font-size: 0.75rem; font-weight: 600;">{{ ucfirst(Auth::user()->role ?? 'Staff') }}</div>
+            </div>
+        </div>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button class="btn btn-sm btn-outline-light w-100">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+            <button class="btn btn-sm btn-outline-light w-100 rounded-pill"><i class="bi bi-box-arrow-right"></i> Logout</button>
         </form>
     </div>
 </div>
 
-{{-- ── Konten Utama ── --}}
 <div class="main-content">
-    {{-- Topbar --}}
     <div class="topbar">
-        <h5 class="mb-0 fw-semibold">@yield('page-title', 'Dashboard')</h5>
-        <span class="text-muted small">{{ now()->isoFormat('dddd, D MMMM Y') }}</span>
+        <h5 class="mb-0 fw-bold">@yield('page-title', 'Dashboard')</h5>
+        <div class="d-flex align-items-center gap-3">
+            @php $panggilanCount = \App\Models\Panggilan::where('status', 'pending')->count(); @endphp
+            <a href="#" class="position-relative text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalPanggilan">
+                <i class="bi bi-bell fs-5 {{ $panggilanCount > 0 ? 'text-warning' : 'text-secondary' }}"></i>
+                <span class="badge rounded-pill {{ $panggilanCount > 0 ? 'bg-warning text-dark' : 'bg-secondary' }}">{{ $panggilanCount }}</span>
+            </a>
+            <span class="text-muted small border-start ps-3">{{ now()->isoFormat('dddd, D MMMM Y') }}</span>
+        </div>
     </div>
-
-    {{-- Alert --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
-            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if ($errors->any())
-        <div class="alert alert-danger rounded-3">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <ul class="mb-0">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-        </div>
-    @endif
-
-    {{-- Konten halaman --}}
+    @if (session('success')) <div class="alert alert-success rounded-4">{{ session('success') }}</div> @endif
     @yield('content')
 </div>
 
+<div class="modal fade" id="modalPanggilan" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0"><h6 class="modal-title fw-bold">Daftar Panggilan</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="notif-body">Memuat...</div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('modalPanggilan').addEventListener('show.bs.modal', function () {
+        const notifBody = document.getElementById('notif-body');
+        notifBody.innerHTML = '<div class="text-center py-3">Memuat data...</div>';
+        fetch("{{ route('kasir.panggilan.list') }}")
+            .then(res => res.text())
+            .then(html => { notifBody.innerHTML = html; })
+            .catch(() => { notifBody.innerHTML = '<p class="text-center text-danger">Gagal memuat.</p>'; });
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

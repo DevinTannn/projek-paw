@@ -79,27 +79,26 @@
                     </thead>
                     <tbody>
                         @foreach ($transaksiHariIni as $trx)
-                        <tr>
-                            <td class="fw-semibold">{{ $trx->kode_transaksi }}</td>
-                            <td class="text-muted small">{{ $trx->created_at->format('H:i') }}</td>
-                            <td>{{ $trx->details->count() }} item</td>
-                            <td class="fw-semibold">Rp {{ number_format($trx->total_harga, 0, ',', '.') }}</td>
-                            <td>
-                                <span class="badge bg-light text-dark text-capitalize">
-                                    {{ $trx->metode_bayar }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge badge-{{ $trx->status }} px-2 py-1 rounded-pill text-capitalize">
-                                    {{ $trx->status }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{{ route('kasir.struk', $trx->id) }}" class="btn btn-sm btn-outline-success">
-                                    <i class="bi bi-printer"></i> Struk
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="fw-semibold">{{ $trx->kode_transaksi }}</td>
+                                <td class="text-muted small">{{ $trx->created_at->format('H:i') }}</td>
+                                
+                                {{-- FIX: Menggunakan sum('qty') agar total item akurat --}}
+                                <td>{{ $trx->details->sum('qty') }} item</td>
+                                
+                                <td class="fw-semibold">Rp {{ number_format($trx->total_harga, 0, ',', '.') }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark text-capitalize">{{ $trx->metode_bayar }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ $trx->status }} px-2 py-1 rounded-pill text-capitalize">{{ $trx->status }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('kasir.struk', $trx->id) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-printer"></i> Struk
+                                    </a>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>

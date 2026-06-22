@@ -42,9 +42,9 @@ cp .env.example .env
 php artisan key:generate
 Setelah itu, buka file .env dan atur konfigurasi DB_DATABASE, DB_USERNAME, dan DB_PASSWORD sesuai dengan database di komputer Anda.
 
-4. Database Migration
+4. Database Migration 
 Buat tabel-tabel yang diperlukan di database Anda:
-php artisan migrate
+php artisan migrate:fresh --seed
 
 5. Storage Link (PENTING)
 Agar gambar menu muncul, Anda wajib membuat symbolic link agar folder storage terhubung ke folder public:
