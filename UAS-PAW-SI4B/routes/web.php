@@ -67,6 +67,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
     Route::resource('menus', AdminMenuController::class);
     Route::get('/transaksi/history', [TransaksiController::class, 'history'])->name('transaksi.history');
     Route::get('/transaksi/{id}/edit', [TransaksiController::class, 'edit'])->name('transaksi.edit');
-    Route::put('/transaksi/{id}/update', [TransaksiController::class, 'update'])->name('transaksi.update');
+    Route::put('/transaksi/{id}', [TransaksiController::class, 'update'])->name('transaksi.update'); 
+    Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy'); 
     Route::get('/rekap-penjualan/download-pdf', [TransaksiController::class, 'downloadPdf'])->name('rekap.pdf');
 });

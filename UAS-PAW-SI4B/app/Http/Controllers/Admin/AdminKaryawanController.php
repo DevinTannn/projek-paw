@@ -45,12 +45,9 @@ class AdminKaryawanController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            
-            // Pindahkan file fisik
             $file->move(public_path('uploads/profiles'), $fileName);
             
-            // Set path database untuk kedua jenis kolom agar aman menghadapi skema apa pun
-            $data['image'] = 'uploads/profiles/' . $fileName;
+            // GANTI 'image' MENJADI 'image_url' sesuai struktur database Anda
             $data['image_url'] = 'uploads/profiles/' . $fileName;
         }
 
@@ -79,20 +76,16 @@ class AdminKaryawanController extends Controller
 
         // PROSES GANTI GAMBAR LANGSUNG DI FOLDER PUBLIC
         if ($request->hasFile('image')) {
-            // Hapus file fisik lama jika ada di database & storage lokal
-            $oldImage = $user->image ?? $user->image_url;
+            // Sesuaikan pengecekan file lama
+            $oldImage = $user->image_url; // Gunakan image_url
             if ($oldImage && file_exists(public_path($oldImage))) {
                 @unlink(public_path($oldImage));
             }
             
             $file = $request->file('image');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            
-            // Pindahkan file baru
             $file->move(public_path('uploads/profiles'), $fileName);
             
-            // Update kedua kolom agar serasi
-            $data['image'] = 'uploads/profiles/' . $fileName;
             $data['image_url'] = 'uploads/profiles/' . $fileName;
         }
 

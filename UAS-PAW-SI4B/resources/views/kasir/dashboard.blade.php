@@ -82,16 +82,22 @@
                             <tr>
                                 <td class="fw-semibold">{{ $trx->kode_transaksi }}</td>
                                 <td class="text-muted small">{{ $trx->created_at->format('H:i') }}</td>
-                                
-                                {{-- FIX: Menggunakan sum('qty') agar total item akurat --}}
                                 <td>{{ $trx->details->sum('qty') }} item</td>
-                                
                                 <td class="fw-semibold">Rp {{ number_format($trx->total_harga, 0, ',', '.') }}</td>
                                 <td>
                                     <span class="badge bg-light text-dark text-capitalize">{{ $trx->metode_bayar }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-{{ $trx->status }} px-2 py-1 rounded-pill text-capitalize">{{ $trx->status }}</span>
+                                    @php
+                                        $statusColor = [
+                                            'selesai' => 'bg-success text-white',
+                                            'pending' => 'bg-warning text-dark',
+                                            'batal'   => 'bg-danger text-white'
+                                        ];
+                                    @endphp
+                                    <span class="badge {{ $statusColor[$trx->status] ?? 'bg-secondary' }} px-2 py-1 rounded-pill text-capitalize">
+                                        {{ $trx->status }}
+                                    </span>
                                 </td>
                                 <td>
                                     <a href="{{ route('kasir.struk', $trx->id) }}" class="btn btn-sm btn-outline-success">
@@ -130,7 +136,6 @@
                                 @endforeach
                             </ul>
 
-                            {{-- Menampilkan Catatan Pelanggan (Jika Ada) --}}
                             @if($p->catatan)
                                 <div class="alert alert-info p-2 small mt-2">
                                     <strong>Catatan:</strong> {{ $p->catatan }}
@@ -140,11 +145,9 @@
                             <div class="fw-bold mt-2 text-danger">Total: Rp {{ number_format($p->total_harga, 0, ',', '.') }}</div>
                             
                             <div class="d-flex gap-2 mt-3">
-                                {{-- Tombol Detail --}}
                                 <a href="{{ route('kasir.transaksi.show', $p->id) }}" class="btn btn-outline-primary btn-sm flex-grow-1">
                                     Detail
                                 </a>
-                                {{-- Tombol Selesaikan --}}
                                 <form action="{{ route('kasir.transaksi.selesai', $p->id) }}" method="POST" class="flex-grow-1">
                                     @csrf
                                     <button type="submit" class="btn btn-success w-100 btn-sm">Selesaikan</button>

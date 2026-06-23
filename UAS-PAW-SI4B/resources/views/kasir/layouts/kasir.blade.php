@@ -42,9 +42,6 @@
 
         .card { border: none; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        .menu-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important; }
-        
         .user-profile { 
             background: rgba(255,255,255,0.05); border-radius: 16px; padding: 15px; margin: 0 15px;
         }
@@ -66,10 +63,13 @@
 
     <div class="mt-auto p-4">
         <div class="user-profile d-flex align-items-center mb-3">
-            @if(Auth::user()->image_url)
-                <img src="{{ asset('storage/' . Auth::user()->image_url) }}?v={{ time() }}" class="rounded-3 me-3" style="width: 45px; height: 45px; object-fit: cover;">
+            {{-- Bagian diperbaiki di bawah ini --}}
+            @if(Auth::user()->image_url && file_exists(public_path(Auth::user()->image_url)))
+                <img src="{{ asset(Auth::user()->image_url) }}?v={{ time() }}" class="rounded-3 me-3" style="width: 45px; height: 45px; object-fit: cover;">
             @else
-                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: 800;">{{ strtoupper(substr(Auth::user()->name ?? 'K', 0, 1)) }}</div>
+                <div class="bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: 800;">
+                    {{ strtoupper(substr(Auth::user()->name ?? 'K', 0, 1)) }}
+                </div>
             @endif
             <div class="text-white">
                 <div class="fw-bold">{{ Auth::user()->name ?? 'Kasir' }}</div>
@@ -99,6 +99,7 @@
     @yield('content')
 </div>
 
+{{-- Sisa modal dan script tetap sama --}}
 <div class="modal fade" id="modalPanggilan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
