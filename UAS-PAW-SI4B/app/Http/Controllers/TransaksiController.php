@@ -7,6 +7,7 @@ use App\Models\Category;        // ← Model milik teman, JANGAN diubah
 use App\Models\DetailTransaksi;
 use App\Models\Menu;            // ← Model milik teman, JANGAN diubah
 use App\Models\Transaksi;
+use App\Models\Panggilan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;    
@@ -18,7 +19,7 @@ class TransaksiController extends Controller
     // ── GET /kasir/dashboard ──────────────────────────────────
     public function index()
     {
-        // Pastikan 'details' dimuat agar sum('qty') bisa bekerja di Blade
+        // 1. Data Transaksi Selesai (Statistik)
         $transaksiHariIni = Transaksi::with('details')
             ->whereDate('created_at', today())
             ->where('status', 'selesai')
@@ -28,16 +29,22 @@ class TransaksiController extends Controller
         $totalPendapatan = $transaksiHariIni->sum('total_harga');
         $totalTransaksi  = $transaksiHariIni->count();
         
+        // 2. Data Pesanan (Status: pending)
         $pesananPending = Transaksi::with(['details.menu'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
-            ->limit(5) 
             ->get();
             
+        // --- TAMBAHKAN BARIS INI ---
+        // Menghitung jumlah transaksi dengan status 'pending' untuk ditampilkan di statistik
         $transaksiPending = Transaksi::where('status', 'pending')->count();
 
+        // 3. Data Panggilan (Model Panggilan)
+        $daftarPanggilan = Panggilan::where('status', 'aktif')->get();
+
         return view('kasir.dashboard', compact(
-            'transaksiHariIni', 'totalPendapatan', 'totalTransaksi', 'transaksiPending', 'pesananPending'
+            'transaksiHariIni', 'totalPendapatan', 'totalTransaksi', 
+            'transaksiPending', 'pesananPending', 'daftarPanggilan'
         ));
     }
 

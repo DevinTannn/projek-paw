@@ -6,32 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
-
+use Illuminate\Support\Facades\DB;
 
 class CustomerMenuController extends Controller
 {
-    /**
-     * Menampilkan halaman e-menu untuk dibaca dan dipesan oleh pelanggan.
-     */
     public function index()
     {
-        // Mengambil semua data kategori beserta menu yang ada di dalamnya
         $categories = Category::with('menus')->get();
 
-        // Mengirimkan variabel $categories ke file view Blade
-        return view('customers.index', compact('categories'));
+        // Ambil hanya ID menu yang masuk 5 besar terlaris
+        $bestSellerIds = DB::table('detail_transaksis')
+            ->select('menu_id', DB::raw('SUM(qty) as total'))
+            ->groupBy('menu_id')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->pluck('menu_id')
+            ->toArray();
+
+        return view('customers.index', compact('categories', 'bestSellerIds'));
     }
 
     public function struk($id)
     {
         $transaksi = \App\Models\Transaksi::with('detailTransaksi.menu')->findOrFail($id);
-        
-        // Jika ada request ?download=true, maka buat PDF dengan view khusus
         if (request()->has('download')) {
             $pdf = PDF::loadView('customers.pdf', compact('transaksi'));
             return $pdf->download('Struk_Pesanan_' . $transaksi->kode_transaksi . '.pdf');
         }
-
         return view('customers.struk', compact('transaksi'));
     }
 }
