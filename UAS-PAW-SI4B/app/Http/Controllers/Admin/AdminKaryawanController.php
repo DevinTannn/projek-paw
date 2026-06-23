@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class AdminKaryawanController extends Controller
 {
     // READ: Menampilkan daftar karyawan dengan fitur pencarian
     public function index(Request $request)
     {
-        $query = User::where('role', '!=', 'admin'); // Hanya tampilkan kasir/pegawai
+        $query = User::where('role', '!=', 'admin'); 
 
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
@@ -42,9 +41,17 @@ class AdminKaryawanController extends Controller
             'role'     => $request->role,
         ];
 
-        // Proses upload gambar
+        // Simpan gambar langsung ke folder public/uploads/profiles
         if ($request->hasFile('image')) {
-            $data['image_url'] = $request->file('image')->store('profiles', 'public');
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            
+            // Pindahkan file fisik
+            $file->move(public_path('uploads/profiles'), $fileName);
+            
+            // Set path database untuk kedua jenis kolom agar aman menghadapi skema apa pun
+            $data['image'] = 'uploads/profiles/' . $fileName;
+            $data['image_url'] = 'uploads/profiles/' . $fileName;
         }
 
         User::create($data);
@@ -56,36 +63,55 @@ class AdminKaryawanController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
+        
+        // Ambil semua data inputan kecuali password dan file gambarnya
         $data = $request->except(['password', 'image']);
 
         if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
+            $data['password'] = Hash::make($request->password);
         }
 
-        // Proses Ganti Gambar
+        // PROSES GANTI GAMBAR LANGSUNG DI FOLDER PUBLIC
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($user->image_url) {
-                Storage::disk('public')->delete($user->image_url);
+            // Hapus file fisik lama jika ada di database & storage lokal
+            $oldImage = $user->image ?? $user->image_url;
+            if ($oldImage && file_exists(public_path($oldImage))) {
+                @unlink(public_path($oldImage));
             }
-            // Simpan gambar baru
-            $data['image_url'] = $request->file('image')->store('profiles', 'public');
+            
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            
+            // Pindahkan file baru
+            $file->move(public_path('uploads/profiles'), $fileName);
+            
+            // Update kedua kolom agar serasi
+            $data['image'] = 'uploads/profiles/' . $fileName;
+            $data['image_url'] = 'uploads/profiles/' . $fileName;
         }
 
         $user->update($data);
-        return redirect()->route('admin.karyawan.index')->with('success', 'Data berhasil diupdate!');
+        
+        return redirect()->route('admin.karyawan.index')->with('success', 'Data karyawan berhasil diupdate!');
     }
 
     // DELETE: Menghapus karyawan
     public function destroy($id)
     {
         $karyawan = User::findOrFail($id);
+        
+        // Hapus file fisik sebelum menghapus row data
+        $oldImage = $karyawan->image ?? $karyawan->image_url;
+        if ($oldImage && file_exists(public_path($oldImage))) {
+            @unlink(public_path($oldImage));
+        }
+        
         $karyawan->delete();
 
         return redirect()->route('admin.karyawan.index')->with('success', 'Karyawan berhasil dihapus!');
@@ -93,10 +119,7 @@ class AdminKaryawanController extends Controller
 
     public function edit($id)
     {
-        // Mengambil data karyawan berdasarkan ID
         $karyawan = User::findOrFail($id);
-        
-        // Mengirim data ke view edit
         return view('admin.karyawan.edit', compact('karyawan'));
     }
 

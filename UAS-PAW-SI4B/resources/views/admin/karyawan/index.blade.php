@@ -14,13 +14,23 @@
         </a>
     </div>
 
+    {{-- ALERT UNTUK MENAMPILKAN PESAN SUKSES --}}
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
             {{-- Search Bar --}}
             <form action="{{ route('admin.karyawan.index') }}" method="GET" class="mb-4">
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control rounded-start-pill ps-3" placeholder="Cari nama karyawan..." value="{{ request('search') }}">
-                    <button type="submit" class="btn btn-primary rounded-end-pill px-4"><i class="fas fa-search"></i></button>
+                    <input type="text" name="search" class="form-control rounded-start-pill ps-3"
+                        placeholder="Cari nama karyawan..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary rounded-end-pill px-4"><i
+                            class="fas fa-search"></i></button>
                 </div>
             </form>
 
@@ -39,34 +49,42 @@
                         <tr class="bg-light border-0 shadow-sm" style="border-radius: 10px;">
                             <td class="ps-3">
                                 <div class="d-flex align-items-center">
-                                    {{-- Logika Menampilkan Foto --}}
-                                    @if($karyawan->image_url)
-                                        <img src="{{ asset('storage/' . $karyawan->image_url) }}" 
-                                             class="rounded-circle me-3 border shadow-sm" 
-                                             style="width: 45px; height: 45px; object-fit: cover;">
+                                    {{-- LOGIKA FOTO (SUDAH DISESUAIKAN DIREKTORI PUBLIC UPLOADS) --}}
+                                    @if($karyawan->image && file_exists(public_path($karyawan->image)))
+                                    <img src="{{ asset($karyawan->image) }}"
+                                        class="rounded-circle me-3 border shadow-sm"
+                                        style="width: 45px; height: 45px; object-fit: cover;">
+                                    @elseif($karyawan->image_url && file_exists(public_path($karyawan->image_url)))
+                                    <img src="{{ asset($karyawan->image_url) }}"
+                                        class="rounded-circle me-3 border shadow-sm"
+                                        style="width: 45px; height: 45px; object-fit: cover;">
                                     @else
-                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" 
-                                             style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">
-                                            {{ strtoupper(substr($karyawan->name, 0, 1)) }}
-                                        </div>
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                        style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">
+                                        {{ strtoupper(substr($karyawan->name, 0, 1)) }}
+                                    </div>
                                     @endif
                                     <span class="fw-bold text-dark">{{ $karyawan->name }}</span>
                                 </div>
                             </td>
                             <td class="text-muted align-middle">{{ $karyawan->email }}</td>
                             <td class="align-middle">
-                                <span class="badge {{ $karyawan->role == 'admin' ? 'bg-danger-subtle text-danger' : 'bg-info-subtle text-info' }} rounded-pill px-3 py-2">
+                                <span
+                                    class="badge {{ $karyawan->role == 'admin' ? 'bg-danger-subtle text-danger' : 'bg-info-subtle text-info' }} rounded-pill px-3 py-2">
                                     {{ ucfirst($karyawan->role) }}
                                 </span>
                             </td>
                             <td class="text-center align-middle">
                                 <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ route('admin.karyawan.edit', $karyawan->id) }}" class="btn btn-sm btn-outline-warning rounded-pill px-3">
+                                    <a href="{{ route('admin.karyawan.edit', $karyawan->id) }}"
+                                        class="btn btn-sm btn-outline-warning rounded-pill px-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('admin.karyawan.destroy', $karyawan->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.karyawan.destroy', $karyawan->id) }}" method="POST"
+                                        class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Hapus karyawan ini?')">
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                            onclick="return confirm('Hapus karyawan ini?')">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -86,7 +104,14 @@
 </div>
 
 <style>
-    .table-hover tbody tr:hover { transform: scale(1.01); transition: 0.2s; cursor: pointer; }
-    .rounded-4 { border-radius: 1.5rem !important; }
+    .table-hover tbody tr:hover {
+        transform: scale(1.01);
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .rounded-4 {
+        border-radius: 1.5rem !important;
+    }
 </style>
 @endsection

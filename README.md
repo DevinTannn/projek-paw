@@ -49,6 +49,7 @@ php artisan migrate:fresh --seed
 5. Storage Link (PENTING)
 Agar gambar menu muncul, Anda wajib membuat symbolic link agar folder storage terhubung ke folder public:
 php artisan storage:link
+composer require barryvdh/laravel-dompdf
 
 6. Jalankan Server
 php artisan serve

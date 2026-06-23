@@ -10,6 +10,8 @@ use App\Models\Transaksi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;    
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiController extends Controller
 {
@@ -229,5 +231,49 @@ class TransaksiController extends Controller
             ->paginate(10);
 
         return view('kasir.transaksi.pending', compact('pesananPending'));
+    }
+
+    // ── METHOD BARU: DOWNLOAD REKAP PDF ──────────────────────
+    public function downloadPdf(Request $request)
+    {
+        $status = $request->input('status');
+        
+        // Menangkap parameter tanggal, jika kosong default ke rentang bulan ini
+        $startDate = $request->input('start_date') ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+
+        $query = Transaksi::with(['details.menu', 'kasir']);
+
+        // Filter berdasarkan parameter rentang tanggal dari request
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate);
+        }
+
+        if (!empty($status)) {
+            if ($status == 'diubah') {
+                $query->where('is_edited', true);
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        $transaksi = $query->orderByDesc('created_at')->get();
+
+        $totalPendapatan = $transaksi->where('status', 'selesai')->sum('total_harga'); 
+        $totalTransaksi  = $transaksi->count();
+
+        // Data dikirimkan lengkap dengan $startDate dan $endDate agar dibaca oleh Blade PDF
+        $data = [
+            'transaksi'       => $transaksi,
+            'totalPendapatan' => $totalPendapatan,
+            'totalTransaksi'  => $totalTransaksi,
+            'startDate'       => $startDate,
+            'endDate'         => $endDate,
+            'statusText'      => $status ? ucfirst($status) : 'Semua'
+        ];
+
+        $pdf = Pdf::loadView('admin.rekap.pdf', $data);
+        return $pdf->download('Laporan_Transaksi_Padmamula_' . Carbon::now()->format('Ymd_His') . '.pdf');
     }
 }

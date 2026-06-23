@@ -30,11 +30,19 @@
             <h5 class="mb-3">Transaksi Hari Ini</h5>
             <table class="table table-hover">
                 <thead>
-                    <tr><th>ID</th><th>Waktu</th><th>Total</th></tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Waktu</th>
+                        <th>Total</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach($transaksiHariIni as $t)
-                    <tr><td>{{ $t->id }}</td><td>{{ $t->created_at->format('H:i') }}</td><td>Rp {{ number_format($t->total_harga) }}</td></tr>
+                    <tr>
+                        <td>{{ $t->id }}</td>
+                        <td>{{ $t->created_at->format('H:i') }}</td>
+                        <td>Rp {{ number_format($t->total_harga) }}</td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
